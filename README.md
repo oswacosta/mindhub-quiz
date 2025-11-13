@@ -2,6 +2,8 @@
 
 Un juego de preguntas y respuestas educativo y adictivo desarrollado con HTML, CSS y JavaScript. ¡Pon a prueba tus conocimientos y conviértete en una leyenda!
 
+https://oswacosta.github.io/mindhub-quiz/
+
 ## 🚀 Características
 
 - **🎯 6 Categorías:** Historia, Ciencia, Deportes, Tecnología, Videojuegos, Cine/Series
