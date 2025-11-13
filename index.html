@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎮 MindHub</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- PWA Meta Tags -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MindHub">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+
+<!-- Para Android -->
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Service Worker Registration -->
+<script>
+// Registrar Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(registration) {
+        console.log('Service Worker registrado con éxito: ', registration.scope);
+      })
+      .catch(function(error) {
+        console.log('Error registrando Service Worker: ', error);
+      });
+  });
+}
+
+// Detectar si está instalado como PWA
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    console.log('Ejecutando como PWA');
+    document.body.classList.add('pwa-mode');
+  }
+});
+</script>
+</head>
+<body>
+
+  <!-- 🌟 PANTALLA DE BIENVENIDA ANIMADA (centrada y fuera del container) -->
+  <div id="pantallaBienvenida" class="logo">
+    <div class="bienvenida-contenido">
+      <h1 class="titulo-animado">🎮 Bienvenido a <span>MindHub</span></h1>
+      <p class="subtitulo-animado">Pon a prueba tus conocimientos y alcanza la máxima puntuación 🏆</p>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="container">
+    <!-- Pantalla de carga -->
+    <div id="pantallaCarga" class="pantalla activa">
+      <h1>🎮 MindHub</h1>
+      <p class="muted">Cargando... (demo)</p>
+    </div>
+
+    <!-- Nombre de usuario -->
+    <div id="pantallaInicio" class="pantalla">
+      <h2>Bienvenido</h2>
+      <p>Introduce tu nombre de usuario (solo la primera vez)</p>
+      <input id="nombreUsuario" type="text" placeholder="Tu nombre">
+      <button onclick="guardarNombre()">Continuar</button>
+    </div>
+
+    <!-- Elección inicial de dificultad -->
+    <div id="pantallaComenzar" class="pantalla">
+      <h2>Antes de empezar</h2>
+      <p>Escoge la dificultad con la que quieras jugar</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;">
+        <button id="btnFacilInicio" onclick="seleccionarDificultad('facil')">Fácil</button>
+        <button id="btnDificilInicio" onclick="seleccionarDificultad('dificil')" class="bloqueado" disabled>
+          🔒 Difícil
+        </button>
+      </div>
+    </div>
+
+    <!-- Menú principal -->
+    <div id="pantallaMenu" class="pantalla">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2>Selecciona una categoría</h2>
+          <p class="muted">Usuario: <span id="labelUsuario">Invitado</span></p>
+        </div>
+        
+        <!-- En el menú principal, cambia el botón -->
+        <div style="display:flex; align-items:center; gap:8px;">
+          <img id="imgPerfil" src="avatars/avatar0.png" class="avatar-peq">
+          <button onclick="abrirAvatarModal()" class="btn-avatar">Avatar</button>
+          <button id="btnPerfil" class="btn-avatar">👤 Perfil</button>
+        </div>
+      </div>
+
+      <div class="grid-cat" style="margin-top:12px">
+        <button class="categoria-btn" onclick="seleccionarCategoria('Historia')">Historia</button>
+        <button class="categoria-btn" onclick="seleccionarCategoria('Ciencia')">Ciencia</button>
+        <button class="categoria-btn" onclick="seleccionarCategoria('Deportes')">Deportes</button>
+        <button class="categoria-btn" onclick="seleccionarCategoria('Tecnología')">Tecnología</button>
+        <button class="categoria-btn" onclick="seleccionarCategoria('Videojuegos')">Videojuegos</button>
+        <button class="categoria-btn" onclick="seleccionarCategoria('Cine/Series')">Cine / Series</button>
+      </div>
+    </div>
+
+    <!-- Botón de logros (fixed) -->
+    <button id="btnLogros" class="btn-logros">🏆 Logros</button>
+
+    <!-- Botón de Puntos -->
+    <button id="btnPuntos" class="btn-puntos">💡 Puntos</button>
+
+    <!-- Explicación de Puntos -->
+    <div id="explicacionPuntos" class="explicacion-puntos oculto">
+      <ul>
+        <li>Cada respuesta correcta: 10 pts (fácil) / 30 pts (difícil)</li>
+        <li>Rachas suman puntos extra:
+          <ul>
+            <li>2 aciertos: +5 pts</li>
+            <li>3 aciertos: +10 pts</li>
+            <li>4+ aciertos: +15 pts</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div id="listaPuntuaciones"></div>
+
+    <!-- Modal de selección de dificultad -->
+    <div id="modalDificultad" class="modal-dificultad oculto">
+      <div class="modal-contenido animate-fadeIn">
+        <h2 id="tituloCategoriaModal">Selecciona la dificultad</h2>
+        <p>Elige con qué nivel quieres jugar esta categoría:</p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;">
+          <button id="btnFacil">Fácil</button>
+          <button id="btnDificil">Difícil 🔒</button>
+        </div>
+        <button id="cerrarModal" class="cerrar-modal">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Pantalla de preguntas -->
+    <div id="pantallaPreguntas" class="pantalla">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="categoriaActual">Ciencia — Fácil</h3>
+        <div id="timer">⏰ 30s</div>
+      </div>
+      <div id="preguntaTexto">Pregunta 1 / 10: Texto de ejemplo</div>
+      <div id="opciones" class="opciones"></div>
+      <div id="mensaje"></div>
+    </div>
+
+    <!-- Pantalla final -->
+    <div id="pantallaFinal" class="pantalla">
+      <div class="resultado-box">
+        <div class="score" id="resultado"></div>
+        <div class="acciones">
+          <button onclick="repetirPartida()">🔁 Repetir</button>
+          <button onclick="volverMenu()">🏠 Menú principal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de desbloqueo -->
+    <div id="modalDesbloqueo" class="modal hidden">
+      <div class="modal-content">
+        <h2>🔓 ¡Modo Difícil desbloqueado!</h2>
+        <p>🎉 Felicitaciones <strong id="usuarioDesbloqueo"></strong> 🎉</p>
+        <p>Has superado una categoría en fácil con una buena puntuación.</p>
+        <p>Ahora puedes jugar en modo <strong>Difícil</strong>.</p>
+        <button id="btnCerrarDesbloqueo" class="btn-cerrar">Aceptar</button>
+      </div>
+    </div>
+
+    <!-- Modal de LOGROS -->
+    <div id="logrosModal" class="modal hidden">
+      <div class="modal-content">
+        <h2>🏆 Logros de <span id="nombreUsuarioLogros"></span></h2>
+
+        <div class="selector-dificultad-logros">
+          <button id="btnFacilLogros" class="activo">Fácil</button>
+          <button id="btnDificilLogros">Difícil</button>
+        </div>
+
+        <div id="tablaLogros" class="tabla-logros"></div>
+
+        <button id="cerrarLogros" class="btn-cerrar">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- Modal de PERFIL -->
+    <div id="perfilModal" class="modal hidden">
+      <div class="modal-content" style="max-width: 500px;">
+        <h2>👤 Mi Perfil</h2>
+        
+        <div class="perfil-header">
+          <img id="avatarPerfil" src="avatars/default-avatar.png" class="avatar-grande">
+          <div class="info-usuario">
+            <h3 id="nombrePerfil">Usuario</h3>
+            <div id="nivelActual" class="nivel-badge">Novato</div>
+            <div id="puntosTotales" class="muted">0 puntos totales</div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="valor" id="statPartidas">0</div>
+            <div class="label">Partidas</div>
+          </div>
+          <div class="stat-card">
+            <div class="valor" id="statPerfectas">0</div>
+            <div class="label">Perfectas</div>
+          </div>
+          <div class="stat-card">
+            <div class="valor" id="statRacha">0</div>
+            <div class="label">Racha Máxima</div>
+          </div>
+          <div class="stat-card">
+            <div class="valor" id="statCategorias">0</div>
+            <div class="label">Categorías</div>
+          </div>
+        </div>
+
+        <h3>📈 Progreso del Nivel</h3>
+        <div class="nivel-info">
+          <div id="infoNivel">Nivel: Novato</div>
+          <div class="barra-progreso">
+            <div id="barraProgreso" class="progreso" style="width: 0%"></div>
+          </div>
+          <div id="infoProximoNivel" class="muted">100 puntos para el siguiente nivel</div>
+        </div>
+
+        <button id="cerrarPerfil" class="btn-cerrar">Cerrar</button>
+      </div>
+    </div>
+  </div> <!-- Cierra .container -->
+
+  <!-- Modal Avatares -->
+  <div id="avatarModal" class="modal oculto">
+    <div class="modal-content">
+      <h2>Elige tu avatar</h2>
+      <div id="galeriaAvatares" class="grid-avatares">
+        <!-- Los avatares se generarán dinámicamente con JS -->
+      </div>
+      <div style="margin-top: 20px;">
+        <button id="guardarAvatar" onclick="guardarAvatar()">Guardar</button>
+        <button onclick="cerrarAvatarModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Botón de instalación PWA -->
+<button id="installButton" style="display: none;">📱 Instalar App</button>
+
+<script>
+// Detectar si se puede instalar
+let deferredPrompt;
+const installButton = document.getElementById('installButton');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installButton.style.display = 'block';
+});
+
+installButton.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      installButton.style.display = 'none';
+    }
+    deferredPrompt = null;
+  }
+});
+
+// Ocultar botón si ya está instalado
+window.addEventListener('appinstalled', () => {
+  installButton.style.display = 'none';
+  deferredPrompt = null;
+});
+</script>
+
+
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBY1IXCDGhQNe0cXh2zMqaRM-rwmEgi7RY",
+    authDomain: "mindhub-b3954.firebaseapp.com",
+    projectId: "mindhub-b3954",
+    storageBucket: "mindhub-b3954.firebasestorage.app",
+    messagingSenderId: "853446688255",
+    appId: "1:853446688255:web:a8bde57374d16b07697bca"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  </script>
+
+  <!-- Scripts -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

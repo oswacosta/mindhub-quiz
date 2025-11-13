@@ -1,0 +1,1196 @@
+/* =====================================================
+🎨 ESTILOS GENERALES (minimalista blanco / negro)
+===================================================== */
+:root {
+  --bg-light: #f7f7f7;
+  --bg-dark: #ffffff;
+  --text: #222;
+  --text-muted: #666;
+  --border: #ddd;
+  --accent: #111;
+  --accent-hover: #000;
+  --correct: #4caf50;
+  --incorrect: #e74c3c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(135deg, var(--bg-light), var(--bg-dark));
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: background 0.4s ease;
+}
+
+/* =====================================================
+🧩 ESTRUCTURA Y TIPOGRAFÍA
+===================================================== */
+h1, h2, h3 {
+  margin: 8px 0 12px;
+  font-weight: 700;
+}
+
+p {
+  margin: 6px 0;
+  color: var(--text-muted);
+}
+
+.pantalla {
+  display: none;
+  text-align: center;
+  padding: 30px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+}
+
+.pantalla.activa {
+  display: block;
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.25s ease, transform 0.15s ease;
+}
+
+button:hover {
+  background: var(--accent-hover);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  margin: 8px 0 12px;
+  background: #f9f9f9;
+}
+
+/* =====================================================
+🔘 SWITCH DE DIFICULTAD (estilo negro minimalista)
+===================================================== */
+.switch-container {
+  display: inline-flex;
+  background: #f5f5f5;
+  border-radius: 30px;
+  padding: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.switch-option {
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #111;
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+  transition: all 0.25s ease;
+}
+
+.switch-option.active {
+  background: #000;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.switch-option:hover {
+  background: #111;
+  color: #fff;
+}
+
+
+/* =====================================================
+🧠 MENÚ DE CATEGORÍAS (actualizado estilo minimalista invertido)
+===================================================== */
+.grid-cat {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.categoria-btn {
+  padding: 14px;
+  border-radius: 12px;
+  background: #000; /* Fondo negro */
+  color: #fff; /* Texto blanco */
+  font-weight: 600;
+  border: 1px solid #000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.categoria-btn:hover {
+  background: #222; /* Negro más claro al pasar el ratón */
+  transform: scale(1.03);
+}
+
+
+/* =====================================================
+❓ PREGUNTAS Y OPCIONES
+===================================================== */
+#timer {
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+#preguntaTexto {
+  font-size: 1.05rem;
+  margin: 12px 6px;
+  font-weight: 500;
+}
+
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.opcion {
+  width: 100%;
+  max-width: 360px;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.opcion:hover {
+  background: #f0f0f0;
+}
+
+/* =====================================================
+✨ ANIMACIONES DE ACIERTO / ERROR
+===================================================== */
+.opcion.correcta {
+  background-color: var(--correct);
+  color: white;
+  animation: popCorrecta 0.4s ease-out;
+}
+
+.opcion.incorrecta {
+  background-color: var(--incorrect);
+  color: white;
+  animation: shakeIncorrecta 0.4s ease-in-out;
+}
+
+@keyframes popCorrecta {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shakeIncorrecta {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+}
+
+/* =====================================================
+🏁 PANTALLA FINAL
+===================================================== */
+.resultado-box {
+  background: #fff;
+  color: #111;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 25px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.resultado-box h2 {
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.resultado-box button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.resultado-box button:hover {
+  background: var(--accent-hover);
+  transform: scale(1.05);
+}
+
+/* =====================================================
+💫 ANIMACIONES GENERALES
+===================================================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================================================
+🏆 MODAL DE LOGROS
+===================================================== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  padding: 20px 30px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  animation: fadeIn 0.3s ease;
+}
+
+.selector-dificultad-logros button {
+  background: #eee;
+  border: none;
+  padding: 8px 14px;
+  margin: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.selector-dificultad-logros button.activo {
+  background: var(--accent);
+  color: white;
+}
+
+
+
+/* =====================================================
+📱 RESPONSIVE
+===================================================== */
+@media (max-width: 480px) {
+  .grid-cat {
+    grid-template-columns: 1fr;
+  }
+  .pantalla {
+    border-radius: 0;
+    box-shadow: none;
+    padding: 20px;
+  }
+}
+
+/* ===== PANTALLA DE BIENVENIDA CENTRADA GARANTIZADA ===== */
+#pantallaBienvenida {
+  position: fixed;
+  inset: 0; /* equivale a top:0; left:0; right:0; bottom:0 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centra verticalmente */
+  align-items: center; /* centra horizontalmente */
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #111 0%, #000 100%);
+  color: #fff;
+  text-align: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+
+/* Evitar márgenes del body que desplacen la capa */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Título */
+#pantallaBienvenida h1 {
+  font-size: 3rem;
+  margin: 0;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 0 15px #00bfff, 0 0 25px #00bfff;
+}
+
+/* Subtítulo */
+#pantallaBienvenida p {
+  font-size: 1.2rem;
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+/* Animación de entrada */
+@keyframes zoomIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+#pantallaBienvenida .logo {
+  animation: zoomIn 1.5s ease forwards;
+  transform-origin: center;
+}
+
+/* Desvanecimiento */
+#pantallaBienvenida.fadeOut {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* =====================================================
+🎉 MODAL DESBLOQUEO DIFICULTAD
+===================================================== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.modal.hidden {
+  display: none;
+  opacity: 0;
+}
+
+.modal-content {
+  background: #111;
+  color: #fff;
+  padding: 30px 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(255,255,255,0.15);
+  animation: popIn 0.5s ease forwards;
+}
+
+.modal-content h2 {
+  color: #00ffcc;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px #00ffcc;
+}
+
+.btn-cerrar {
+  margin-top: 20px;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 10px;
+  background: #00ffcc;
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-cerrar:hover {
+  background: #00ffaa;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* =====================================================
+🎚️ MODAL DE SELECCIÓN DE DIFICULTAD
+===================================================== */
+.modal-dificultad {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-dificultad.oculto {
+  display: none;
+}
+
+.modal-contenido {
+  background: #111;
+  color: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.4);
+  width: 90%;
+  max-width: 400px;
+  animation: fadeIn 0.5s ease;
+}
+
+.cerrar-modal {
+  background: transparent;
+  border: 1px solid #888;
+  color: #aaa;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.cerrar-modal:hover {
+  color: #fff;
+  border-color: #fff;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* =====================================================
+🎉 ANIMACIÓN CONFETI / BRILLO MODAL DESBLOQUEO
+===================================================== */
+.confeti {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 14px;
+  opacity: 0.9;
+  border-radius: 2px;
+  animation: caerConfeti 3.5s ease-in forwards;
+  z-index: 99999;
+}
+
+@keyframes caerConfeti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(200px) rotate(180deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(600px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+
+/* Estilo tarjetas Logros */
+.tarjeta-puntuacion {
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  margin: 10px 0;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.tarjeta-puntuacion:hover {
+  transform: scale(1.03);
+}
+
+.tarjeta-header {
+  color: white;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tarjeta-body {
+  padding: 10px 12px;
+  background-color: #f9f9f9;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  0% {opacity:0; transform: translateY(-10px);}
+  100% {opacity:1; transform: translateY(0);}
+}
+
+.fixed-top-right {
+  position: fixed;
+  top: 70px; /* un poco debajo del botón de logros */
+  right: 20px;
+  width: 240px;
+  z-index: 210;
+  text-align: left;
+}
+
+.btn-explicacion {
+  width: 100%;
+  text-align: left;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+}
+
+.explicacion-puntos {
+  margin-top: 6px;
+  padding: 10px;
+  background: var(--accent); /* mismo color que btn-logros */
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  font-size: 0.85rem;
+}
+
+.explicacion-puntos ul {
+  margin-left: 15px;
+  list-style-type: disc;
+}
+
+.explicacion-puntos ul ul {
+  list-style-type: circle;
+}
+
+.oculto {
+  display: none;
+}
+
+/* =====================================================
+🏆 BOTÓN DE LOGROS
+===================================================== */
+.btn-logros {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  z-index: 200;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  animation: pulseLogros 2s infinite;
+}
+
+.btn-logros:hover {
+  background: #222;
+  transform: scale(1.08) rotate(-1deg);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* =====================================================
+💡 BOTÓN DE PUNTOS (MODIFICADO - AHORA DEBAJO DE LOGROS)
+===================================================== */
+.btn-puntos {
+  position: fixed;
+  top: 70px; /* Cambiado: ahora está debajo del botón Logros */
+  right: 20px; /* Misma posición horizontal que Logros */
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  z-index: 200;
+  white-space: nowrap;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-puntos:hover {
+  background: #222;
+  transform: scale(1.05);
+}
+
+/* =====================================================
+📝 EXPLICACIÓN DE PUNTOS (AJUSTADA A LA NUEVA POSICIÓN)
+===================================================== */
+.explicacion-puntos {
+  position: fixed;
+  top: 100px; /* Debajo del botón Puntos */
+  right: 20px; /* Misma posición horizontal */
+  background: var(--accent);
+  color: white;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  max-width: 220px;
+  line-height: 1.3;
+  z-index: 190;
+}
+
+.explicacion-puntos ul {
+  margin: 4px 0 0 15px;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.explicacion-puntos ul ul {
+  list-style-type: circle;
+}
+
+/* =====================================================
+🧑‍🎨 MODAL SELECCIÓN AVATARES
+===================================================== */
+.grid-avatares {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.grid-avatares img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.2s;
+}
+
+.grid-avatares img.seleccionado {
+  border-color: #00f;
+}
+
+/* =====================================================
+👤 ESTILOS PARA AVATARES
+===================================================== */
+.avatar-peq {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  object-fit: cover;
+}
+
+/* Grid para galería de avatares */
+.grid-avatares {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.grid-avatares img.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.grid-avatares img.avatar:hover {
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+.grid-avatares img.avatar.seleccionado {
+  border-color: #0077ff;
+  border-width: 3px;
+  box-shadow: 0 0 10px rgba(0, 119, 255, 0.5);
+}
+
+/* Botón guardar avatar específico */
+#guardarAvatar {
+  background: #0077ff;
+  margin-right: 10px;
+}
+
+#guardarAvatar:hover {
+  background: #0055cc;
+}
+
+/* =====================================================
+👤 BOTÓN AVATAR (PEQUEÑO, DISCRETO Y CON FONDO NEGRO)
+===================================================== */
+.btn-avatar {
+  background: var(--accent); /* Fondo negro */
+  color: white; /* Texto blanco */
+  border: 1px solid var(--accent); /* Borde negro */
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-avatar:hover {
+  background: #222; /* Negro un poco más claro al hover */
+  color: white;
+  border-color: #222;
+}
+
+/* =====================================================
+📊 SISTEMA DE NIVELES E INSIGNIAS
+===================================================== */
+.nivel-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  border-left: 4px solid var(--accent);
+}
+
+.barra-progreso {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progreso {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+  transition: width 0.5s ease;
+}
+
+.nuevas-insignias {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  animation: pulse 2s infinite;
+}
+
+.insignia {
+  background: rgba(255,255,255,0.2);
+  padding: 10px;
+  border-radius: 8px;
+  margin: 8px 0;
+  backdrop-filter: blur(10px);
+}
+
+/* Modal de perfil y progreso */
+.perfil-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.avatar-grande {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+}
+
+.info-usuario h3 {
+  margin: 0;
+  color: var(--accent);
+}
+
+/* Grid de insignias */
+.grid-insignias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.insignia-card {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.insignia-card.desbloqueada {
+  border-color: #4CAF50;
+  background: #f8fff8;
+}
+
+.insignia-card .icono {
+  font-size: 2rem;
+  margin-bottom: 5px;
+}
+
+.insignia-card .nombre {
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.insignia-card .descripcion {
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Estadísticas */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.stat-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-card .valor {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.stat-card .label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* =====================================================
+👤 MODAL DE PERFIL RESPONSIVE PARA MÓVIL
+===================================================== */
+#perfilModal .modal-content {
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  margin: 10vh auto;
+  padding: 20px;
+  position: relative;
+}
+
+/* Asegurar que el modal sea scrollable en móviles */
+#perfilModal {
+  align-items: flex-start;
+  padding-top: 10vh;
+  overflow-y: auto;
+}
+
+/* Header del perfil responsive */
+.perfil-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.perfil-header .avatar-grande {
+  width: 60px;
+  height: 60px;
+}
+
+.info-usuario h3 {
+  margin: 5px 0;
+  font-size: 1.2rem;
+}
+
+.nivel-badge {
+  background: var(--accent);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-block;
+  margin: 5px 0;
+}
+
+/* Stats grid responsive */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.stat-card {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat-card .valor {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.stat-card .label {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Barra de progreso */
+.nivel-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  border-left: 4px solid var(--accent);
+}
+
+#infoNivel {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.barra-progreso {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progreso {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+#infoProximoNivel {
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+/* Botón cerrar fijo en la parte inferior */
+#perfilModal .btn-cerrar {
+  position: sticky;
+  bottom: 0;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-top: 20px;
+  width: 100%;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Ajustes específicos para pantallas muy pequeñas */
+@media (max-width: 380px) {
+  #perfilModal .modal-content {
+    max-width: 95vw;
+    padding: 15px;
+    margin: 5vh auto;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .perfil-header {
+    padding: 10px;
+  }
+}
+
+/* Asegurar que el modal sea scrollable */
+.modal {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+}
+
+/* Prevenir que el body se desplace detrás del modal */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* =====================================================
+📱 PWA STYLES
+===================================================== */
+
+/* Indicador cuando está en modo PWA */
+body.pwa-mode::before {
+  content: "📱 Modo App";
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #4CAF50;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  z-index: 10000;
+  opacity: 0.7;
+}
+
+/* Mejorar experiencia PWA */
+@media (display-mode: standalone) {
+  body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Ocultar barra de dirección en algunos navegadores */
+  .pantalla {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+/* Botón de instalación PWA */
+#installButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+  display: none;
+}
+
+#installButton:hover {
+  background: #45a049;
+}
+
+/* =====================================================
+📊 MEJORAS PARA LA TABLA DE LOGROS
+===================================================== */
+.tabla-contenedor {
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 15px 0;
+}
+
+.tabla-contenedor table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tabla-contenedor th {
+  background: var(--accent);
+  color: white;
+  padding: 10px 8px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+}
+
+.tabla-contenedor td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.fila-destacada {
+  background: #fffacd !important;
+  border-left: 4px solid #ffd700;
+}
+
+.info-puntuaciones {
+  text-align: center;
+  margin-top: 10px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Para móviles */
+@media (max-width: 768px) {
+  .tabla-contenedor table {
+    font-size: 0.8rem;
+  }
+  
+  .tabla-contenedor th,
+  .tabla-contenedor td {
+    padding: 6px 4px;
+  }
+  
+  .tabla-contenedor {
+    max-height: 300px;
+  }
+}
