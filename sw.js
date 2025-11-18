@@ -1,18 +1,19 @@
-// sw.js - Service Worker simple
-const CACHE_NAME = 'mindhub-v1.3';
+// sw.js - Service Worker corregido para GitHub Pages
+const CACHE_NAME = 'mindhub-v1.4';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/js/main.js',
-  '/js/partida.js', 
-  '/js/utils.js',
-  '/js/niveles.js',
-  '/js/usuario.js',
-  '/js/config.js',
-  '/js/bancoPreguntas.js',
-  '/js/logros.js',
-  '/avatars/default-avatar.png'
+  './',
+  './index.html',
+  './styles.css',
+  './js/main.js',
+  './js/partida.js', 
+  './js/utils.js',
+  './js/niveles.js',
+  './js/usuario.js',
+  './js/config.js',
+  './js/bancoPreguntas.js',
+  './js/logros.js',
+  './avatars/default-avatar.png',
+  './manifest.json'
 ];
 
 self.addEventListener('install', function(event) {

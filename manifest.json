@@ -2,7 +2,7 @@
   "name": "MindHub Quiz",
   "short_name": "MindHub",
   "description": "Juego de preguntas y respuestas educativo",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
