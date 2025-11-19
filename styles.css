@@ -62,24 +62,6 @@ body::before {
   100% { background-position: 100% 100%; }
 }
 
-/* Efecto de partículas sutiles */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
-    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
-    radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
-  background-size: 550px 550px, 350px 350px, 250px 250px;
-  background-position: 0 0, 40px 60px, 130px 270px;
-  z-index: -1;
-  opacity: 0.3;
-}
-
 @keyframes pulseBackground {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
@@ -181,7 +163,6 @@ input[type="text"] {
   color: #fff;
 }
 
-
 /* =====================================================
 🧠 MENÚ DE CATEGORÍAS (actualizado estilo minimalista invertido)
 ===================================================== */
@@ -208,7 +189,6 @@ input[type="text"] {
   background: #222; /* Negro más claro al pasar el ratón */
   transform: scale(1.03);
 }
-
 
 /* =====================================================
 ❓ PREGUNTAS Y OPCIONES
@@ -368,8 +348,6 @@ input[type="text"] {
   color: white;
 }
 
-
-
 /* =====================================================
 📱 RESPONSIVE
 ===================================================== */
@@ -401,7 +379,6 @@ input[type="text"] {
   opacity: 1;
   transition: opacity 1s ease;
 }
-
 
 /* Evitar márgenes del body que desplacen la capa */
 html, body {
@@ -443,7 +420,6 @@ html, body {
   opacity: 0;
   pointer-events: none;
 }
-
 
 /* =====================================================
 🎉 MODAL DESBLOQUEO DIFICULTAD
@@ -585,7 +561,6 @@ html, body {
   }
 }
 
-
 /* Estilo tarjetas Logros */
 .tarjeta-puntuacion {
   border-radius: 12px;
@@ -661,12 +636,11 @@ html, body {
 }
 
 /* =====================================================
-🏆 BOTÓN DE LOGROS (VERSIÓN MEJORADA)
+🏆 BOTONES FLOTANTES - SIEMPRE ARRIBA A LA DERECHA
 ===================================================== */
-.btn-logros {
+
+.btn-logros, .btn-puntos {
   position: fixed;
-  top: max(20px, env(safe-area-inset-top));
-  right: 20px;
   background: var(--accent);
   color: white;
   border: none;
@@ -676,45 +650,142 @@ html, body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   z-index: 200;
-  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
-}
-
-/* =====================================================
-💡 BOTÓN DE PUNTOS (VERSIÓN MEJORADA)
-===================================================== */
-.btn-puntos {
-  position: fixed;
-  top: max(70px, calc(env(safe-area-inset-top) + 50px));
-  right: 20px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 6px 12px;
-  font-weight: 600;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  z-index: 200;
+  transition: background 0.3s, transform 0.2s;
   white-space: nowrap;
-  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  display: none; /* Ocultos por defecto */
 }
 
-/* =====================================================
-📝 EXPLICACIÓN DE PUNTOS (VERSIÓN MEJORADA)
-===================================================== */
+/* POSICIÓN PARA TODOS LOS DISPOSITIVOS */
+.btn-logros {
+  top: 20px;
+  right: 20px;
+}
+
+.btn-puntos {
+  top: 70px;
+  right: 20px;
+}
+
+/* Mostrar solo en pantalla de menú */
+#pantallaMenu.activa ~ .btn-logros,
+#pantallaMenu.activa ~ .btn-puntos {
+  display: block;
+}
+
+/* Explicación de puntos - ESTILOS CORREGIDOS */
 .explicacion-puntos {
   position: fixed;
-  top: max(100px, calc(env(safe-area-inset-top) + 80px));
+  top: 100px;
   right: 20px;
   background: var(--accent);
   color: white;
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 12px 15px;
   font-size: 0.85rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  max-width: 220px;
-  line-height: 1.3;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  max-width: 250px;
+  line-height: 1.4;
   z-index: 190;
+  
+  /* IMPORTANTE: Quitar display:none por defecto */
+  /* display: none; */ /* ← ESTA LÍNEA DEBE ELIMINARSE */
+}
+
+/* Clase para ocultar la explicación */
+.explicacion-puntos.oculto {
+  display: none !important;
+}
+
+/* Mostrar explicación cuando no está oculta */
+.explicacion-puntos:not(.oculto) {
+  display: block;
+}
+
+/* =====================================================
+📱 AJUSTES PARA MÓVIL
+===================================================== */
+@media (max-width: 768px) {
+  .btn-logros {
+    top: 15px;
+    right: 15px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .btn-puntos {
+    top: 60px;
+    right: 15px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .explicacion-puntos {
+    top: 95px;
+    right: 15px;
+    max-width: 220px;
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
+  
+  /* Asegurar que el contenido no quede detrás de los botones */
+  .container {
+    padding-top: 100px;
+    padding-bottom: 20px;
+  }
+  
+  /* Ajustar pantallas específicas */
+  .pantalla {
+    margin-top: 10px;
+  }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .btn-logros {
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .btn-puntos {
+    top: 50px;
+    right: 10px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .explicacion-puntos {
+    top: 85px;
+    right: 10px;
+    max-width: 200px;
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .container {
+    padding-top: 90px;
+  }
+}
+
+/* =====================================================
+🎯 BOTONES EN MODO PWA
+===================================================== */
+@media (display-mode: standalone) {
+  .btn-logros {
+    top: max(15px, env(safe-area-inset-top));
+    right: 15px;
+  }
+  
+  .btn-puntos {
+    top: max(60px, calc(env(safe-area-inset-top) + 45px));
+    right: 15px;
+  }
+  
+  .explicacion-puntos {
+    top: max(95px, calc(env(safe-area-inset-top) + 80px));
+    right: 15px;
+  }
 }
 
 /* =====================================================
