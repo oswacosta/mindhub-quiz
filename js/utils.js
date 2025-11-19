@@ -119,11 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnFacil && btnDificil) {
       btnFacil.addEventListener('click', () => {
+        reproducirClick(); // 🔥 AÑADIDO
         btnFacil.classList.add('activo');
         btnDificil.classList.remove('activo');
         mostrarLogros();
       });
       btnDificil.addEventListener('click', () => {
+        reproducirClick(); // 🔥 AÑADIDO
         btnDificil.classList.add('activo');
         btnFacil.classList.remove('activo');
         mostrarLogros();

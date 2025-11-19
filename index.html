@@ -6,12 +6,10 @@
   <title>🎮 MindHub</title>
   <link rel="stylesheet" href="styles.css" />
 
-   <!-- Evitar zoom y otros comportamientos no deseados -->
   <meta name="HandheldFriendly" content="true">
   <meta name="format-detection" content="telephone=no">
 
-  <!-- PWA Meta Tags -->
-<link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,10 +17,8 @@
 <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 
 
-<!-- Para Android -->
 <meta name="mobile-web-app-capable" content="yes">
 
-<!-- Service Worker Registration -->
 <script>
 // Registrar Service Worker
 if ('serviceWorker' in navigator) {
@@ -49,7 +45,6 @@ window.addEventListener('DOMContentLoaded', () => {
 </head>
 <body>
 
-  <!-- 🌟 PANTALLA DE BIENVENIDA ANIMADA (centrada y fuera del container) -->
   <div id="pantallaBienvenida" class="logo">
     <div class="bienvenida-contenido">
       <h1 class="titulo-animado">🎮 Bienvenido a <span>MindHub</span></h1>
@@ -57,15 +52,12 @@ window.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
 
-  <!-- CONTENEDOR PRINCIPAL -->
   <div class="container">
-    <!-- Pantalla de carga -->
     <div id="pantallaCarga" class="pantalla activa">
       <h1>🎮 MindHub</h1>
       <p class="muted">Cargando... (demo)</p>
     </div>
 
-    <!-- Nombre de usuario -->
     <div id="pantallaInicio" class="pantalla">
       <h2>Bienvenido</h2>
       <p>Introduce tu nombre de usuario (solo la primera vez)</p>
@@ -73,7 +65,6 @@ window.addEventListener('DOMContentLoaded', () => {
       <button onclick="guardarNombre()">Continuar</button>
     </div>
 
-    <!-- Elección inicial de dificultad -->
     <div id="pantallaComenzar" class="pantalla">
       <h2>Antes de empezar</h2>
       <p>Escoge la dificultad con la que quieras jugar</p>
@@ -85,7 +76,6 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-    <!-- Menú principal -->
     <div id="pantallaMenu" class="pantalla">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
@@ -93,11 +83,10 @@ window.addEventListener('DOMContentLoaded', () => {
           <p class="muted">Usuario: <span id="labelUsuario">Invitado</span></p>
         </div>
         
-        <!-- En el menú principal, cambia el botón -->
         <div style="display:flex; align-items:center; gap:8px;">
           <img id="imgPerfil" src="avatars/avatar0.png" class="avatar-peq">
           <button onclick="abrirAvatarModal()" class="btn-avatar">Avatar</button>
-          <button id="btnPerfil" class="btn-avatar">👤 Perfil</button>
+          <button onclick="abrirPerfilModal()" class="btn-avatar">👤 Perfil</button>
         </div>
       </div>
 
@@ -111,13 +100,10 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-    <!-- Botón de logros (fixed) -->
-    <button id="btnLogros" class="btn-logros">🏆 Logros</button>
+    <button id="btnLogros" class="btn-logros" onclick="mostrarLogros()">🏆 Logros</button>
 
-    <!-- Botón de Puntos -->
-    <button id="btnPuntos" class="btn-puntos">💡 Puntos</button>
+    <button id="btnPuntos" class="btn-puntos" onclick="toggleExplicacionPuntos()">💡 Puntos</button>
 
-    <!-- Explicación de Puntos -->
     <div id="explicacionPuntos" class="explicacion-puntos oculto">
       <ul>
         <li>Cada respuesta correcta: 10 pts (fácil) / 30 pts (difícil)</li>
@@ -133,7 +119,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     <div id="listaPuntuaciones"></div>
 
-    <!-- Modal de selección de dificultad -->
     <div id="modalDificultad" class="modal-dificultad oculto">
       <div class="modal-contenido animate-fadeIn">
         <h2 id="tituloCategoriaModal">Selecciona la dificultad</h2>
@@ -146,7 +131,6 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-    <!-- Pantalla de preguntas -->
     <div id="pantallaPreguntas" class="pantalla">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <h3 id="categoriaActual">Ciencia — Fácil</h3>
@@ -157,7 +141,6 @@ window.addEventListener('DOMContentLoaded', () => {
       <div id="mensaje"></div>
     </div>
 
-    <!-- Pantalla final -->
     <div id="pantallaFinal" class="pantalla">
       <div class="resultado-box">
         <div class="score" id="resultado"></div>
@@ -168,7 +151,6 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-    <!-- Modal de desbloqueo -->
     <div id="modalDesbloqueo" class="modal hidden">
       <div class="modal-content">
         <h2>🔓 ¡Modo Difícil desbloqueado!</h2>
@@ -179,23 +161,21 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-    <!-- Modal de LOGROS -->
     <div id="logrosModal" class="modal hidden">
       <div class="modal-content">
         <h2>🏆 Logros de <span id="nombreUsuarioLogros"></span></h2>
 
         <div class="selector-dificultad-logros">
-          <button id="btnFacilLogros" class="activo">Fácil</button>
-          <button id="btnDificilLogros">Difícil</button>
+          <button id="btnFacilLogros" class="activo" onclick="cargarPuntuaciones('facil')">Fácil</button>
+          <button id="btnDificilLogros" onclick="cargarPuntuaciones('dificil')">Difícil</button>
         </div>
 
         <div id="tablaLogros" class="tabla-logros"></div>
 
-        <button id="cerrarLogros" class="btn-cerrar">Cerrar</button>
+        <button id="cerrarLogros" class="btn-cerrar" onclick="cerrarLogros()">Cerrar</button>
       </div>
     </div>
 
-    <!-- Modal de PERFIL -->
     <div id="perfilModal" class="modal hidden">
       <div class="modal-content" style="max-width: 500px;">
         <h2>👤 Mi Perfil</h2>
@@ -237,18 +217,14 @@ window.addEventListener('DOMContentLoaded', () => {
           <div id="infoProximoNivel" class="muted">100 puntos para el siguiente nivel</div>
         </div>
 
-        <button id="cerrarPerfil" class="btn-cerrar">Cerrar</button>
+        <button id="cerrarPerfil" class="btn-cerrar" onclick="cerrarPerfilModal()">Cerrar</button>
       </div>
     </div>
-  </div> <!-- Cierra .container -->
-
-  <!-- Modal Avatares -->
-  <div id="avatarModal" class="modal oculto">
+  </div> <div id="avatarModal" class="modal oculto">
     <div class="modal-content">
       <h2>Elige tu avatar</h2>
       <div id="galeriaAvatares" class="grid-avatares">
-        <!-- Los avatares se generarán dinámicamente con JS -->
-      </div>
+        </div>
       <div style="margin-top: 20px;">
         <button id="guardarAvatar" onclick="guardarAvatar()">Guardar</button>
         <button onclick="cerrarAvatarModal()">Cancelar</button>
@@ -256,7 +232,6 @@ window.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
 
-<!-- Botón de instalación PWA -->
 <button id="installButton" style="display: none;">📱 Instalar App</button>
 
 <script>
@@ -290,7 +265,6 @@ window.addEventListener('appinstalled', () => {
 
 
 
-  <!-- Firebase SDKs -->
   <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -313,7 +287,6 @@ window.addEventListener('appinstalled', () => {
   const app = initializeApp(firebaseConfig);
   </script>
 
-  <!-- Scripts -->
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

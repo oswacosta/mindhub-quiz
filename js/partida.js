@@ -1,11 +1,15 @@
 // partida.js
 import { CONFIG } from './config.js';
+// import { bancoPreguntas } from './bancoPreguntas.js'; // <-- Ya no es necesario
 import { mostrarPantalla, shuffle, guardarLogro } from './utils.js';
 import { guardarPuntuacionFirebase } from './usuario.js';
-// IMPORTANTE: Usamos la misma URL que en index.html para evitar conflictos
+
+// 🔥 IMPORTACIONES DE SONIDO
+import { reproducirSonido, reproducirClick } from './sonidos.js'; 
+
+// 🔥 IMPORTACIONES DE FIREBASE
 import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Enganchamos con la base de datos que ya inició el index.html
 const db = getFirestore();
 
 // =====================================================
@@ -19,8 +23,6 @@ let racha = 0;
 let temporizadorId = null;
 let tiempoRestante = 0;
 let rachaMaxima = 0;
-
-// 📦 CACHÉ: Para no descargar las mismas preguntas dos veces en la misma sesión
 let cachePreguntas = {};
 
 // =====================================================
@@ -35,7 +37,7 @@ function getDificultad() {
 }
 
 // =====================================================
-// 📊 ESTADÍSTICAS Y NIVELES (Lógica interna)
+// 📊 SISTEMA DE ESTADÍSTICAS Y NIVELES (Reincluido)
 // =====================================================
 function actualizarEstadisticasUsuario(resultadoPartida) {
   const usuario = getUsuario();
@@ -110,8 +112,9 @@ function obtenerProgresoNivel(puntosTotales) {
   return { progreso: Math.min(100, Math.max(0, progreso)), restante };
 }
 
+
 /* =====================================================
-🎯 SELECCIONAR CATEGORÍA
+🎯 SELECCIONAR CATEGORÍA (con click en selección de dificultad)
 ===================================================== */
 export function seleccionarCategoria(cat) {
   categoria = cat;
@@ -136,6 +139,7 @@ export function seleccionarCategoria(cat) {
   btnDificil.innerHTML = desbloqueado ? 'Difícil' : 'Difícil 🔒';
 
   btnFacil.onclick = () => {
+    reproducirClick(); // 🔥 SOLUCIÓN: Sonido al elegir 'Fácil'
     localStorage.setItem('dificultadQuiz', 'facil');
     modal.classList.add('oculto');
     iniciarPartida();
@@ -143,28 +147,30 @@ export function seleccionarCategoria(cat) {
 
   btnDificil.onclick = () => {
     if (!btnDificil.disabled) {
+      reproducirClick(); // 🔥 SOLUCIÓN: Sonido al elegir 'Difícil'
       localStorage.setItem('dificultadQuiz', 'dificil');
       modal.classList.add('oculto');
       iniciarPartida();
     }
   };
 
-  cerrarModal.onclick = () => modal.classList.add('oculto');
+  cerrarModal.onclick = () => {
+    reproducirClick(); // 🔥 SOLUCIÓN: Sonido al cerrar el modal
+    modal.classList.add('oculto');
+  };
 }
 
 /* =====================================================
-☁️ DESCARGAR PREGUNTAS
+☁️ CARGAR PREGUNTAS (Firestore Logic)
 ===================================================== */
 async function cargarPreguntas(categoria, dificultad) {
   const clave = `${dificultad}_${categoria}`;
   
-  // 1. Mirar en caché primero
   if (cachePreguntas[clave]) {
     console.log("📦 Usando caché local para", clave);
     return cachePreguntas[clave];
   }
 
-  // 2. Descargar de Firebase
   console.log(`☁️ Descargando preguntas de ${categoria} (${dificultad})...`);
   
   try {
@@ -181,7 +187,6 @@ async function cargarPreguntas(categoria, dificultad) {
       lista.push(doc.data());
     });
 
-    // 3. Guardar en caché si encontramos algo
     if (lista.length > 0) {
       cachePreguntas[clave] = lista;
       return lista;
@@ -190,36 +195,26 @@ async function cargarPreguntas(categoria, dificultad) {
     }
   } catch (error) {
     console.error("Error descargando preguntas:", error);
-    return null; // Retornamos null para indicar error de conexión
+    return null;
   }
 }
 
 /* =====================================================
-🎮 INICIAR PARTIDA 
+🎮 INICIAR PARTIDA
 ===================================================== */
 export async function iniciarPartida() {
   const dificultad = getDificultad();
   
-  // 1. Mostrar pantalla de carga
   mostrarPantalla('pantallaCarga'); 
 
-  // 2. Esperar descarga de preguntas
   const todas = await cargarPreguntas(categoria, dificultad);
 
-  // 3. Validaciones
-  if (todas === null) {
-    alert("Error de conexión. Revisa tu internet.");
+  if (todas === null || todas.length === 0) {
+    alert("Error de conexión o no hay preguntas disponibles.");
     mostrarPantalla('pantallaMenu');
     return;
   }
 
-  if (todas.length === 0) {
-    alert(`No hay preguntas disponibles en la nube para ${categoria}.`);
-    mostrarPantalla('pantallaMenu');
-    return;
-  }
-
-  // 4. Configuración del juego (igual que antes)
   const cfg = CONFIG[dificultad] || CONFIG.facil;
   
   preguntasPartida = shuffle(todas).slice(0, cfg.perGame).map(q => ({
@@ -267,7 +262,8 @@ function mostrarPregunta() {
     const btn = document.createElement('button');
     btn.className = 'opcion';
     btn.textContent = op;
-    btn.onclick = () => seleccionarRespuesta(op, btn);
+    // La respuesta se selecciona en seleccionarRespuesta(), que tiene el sonido de acierto/error
+    btn.onclick = () => seleccionarRespuesta(op, btn); 
     opcionesDiv.appendChild(btn);
   });
 
@@ -299,6 +295,8 @@ function manejarTiempoAgotado() {
   const msg = document.getElementById('mensaje');
   if (msg) msg.textContent = "¡Tiempo agotado!";
   
+  reproducirSonido('error'); // 🔥 SONIDO: Error por tiempo agotado
+  
   const correcta = preguntasPartida[preguntaIndex]?.correcta;
   document.querySelectorAll('.opcion').forEach(b => {
     if (b.textContent === correcta) b.classList.add('correcta');
@@ -312,7 +310,7 @@ function manejarTiempoAgotado() {
 }
 
 /* =====================================================
-✅ RESPONDER
+✅ RESPONDER (con sonido de acierto/error)
 ===================================================== */
 function seleccionarRespuesta(opcion, boton) {
   clearInterval(temporizadorId);
@@ -325,19 +323,25 @@ function seleccionarRespuesta(opcion, boton) {
 
   if (opcion === q.correcta) {
     boton.classList.add('correcta');
+    reproducirSonido('acierto'); // 🔥 SONIDO DE ACIERTO
+    
     puntos += (dificultad === 'facil') ? 10 : 30;
     racha++;
     rachaMaxima = Math.max(rachaMaxima, racha);
     
     if (racha === 2) puntos += 5;
     else if (racha === 3) puntos += 10;
-    else if (racha >= 4) puntos += 15;
+    else if (racha >= 4) {
+      puntos += 15;
+      if (racha % 5 === 0) reproducirSonido('racha'); // 🔥 SONIDO OPCIONAL PARA RACHA
+    }
   } else {
     boton.classList.add('incorrecta');
     document.querySelectorAll('.opcion').forEach(b => {
       if (b.textContent === q.correcta) b.classList.add('correcta');
     });
     racha = 0;
+    reproducirSonido('error'); // 🔥 SONIDO DE ERROR
   }
 
   setTimeout(() => {
@@ -351,16 +355,13 @@ function seleccionarRespuesta(opcion, boton) {
 🏁 FINALIZAR PARTIDA
 ===================================================== */
 function finalizarPartida() {
-  console.log("Finalizando partida...");
   clearInterval(temporizadorId);
 
   const usuario = getUsuario();
   const dificultad = getDificultad();
   
-  // Guardar logro local
   guardarLogro(usuario, categoria, dificultad, puntos);
 
-  // Actualizar estadísticas
   const resultadoPartida = {
     categoria,
     dificultad,
@@ -373,7 +374,6 @@ function finalizarPartida() {
   const nivel = calcularNivel(stats.puntosTotales);
   const { progreso, restante } = obtenerProgresoNivel(stats.puntosTotales);
 
-  // Mostrar resultado en pantalla final
   const resultadoDiv = document.getElementById("resultado");
   if (resultadoDiv) {
     resultadoDiv.innerHTML = `
@@ -393,10 +393,8 @@ function finalizarPartida() {
     `;
   }
 
-  // Guardar puntuación en Firebase
   guardarPuntuacionFirebase(categoria, puntos);
 
-  // Verificar desbloqueo de dificultad difícil
   verificarDesbloqueo();
 
   setTimeout(() => {
@@ -412,19 +410,15 @@ function verificarDesbloqueo() {
   if (dificultad !== 'facil') return;
 
   const totalPreguntas = preguntasPartida.length;
-  const aciertos = Math.round(puntos / 10); // Aprox, asumiendo sin bonos de racha para simplificar
-  
-  // Si queremos ser más precisos con los aciertos, podríamos contarlos en seleccionarRespuesta
-  // Pero para desbloquear, >50% de los puntos máximos posibles suele valer.
-  // Usemos un cálculo simple: si tienes más de la mitad de puntos base (10 * preguntas / 2)
-  
   const puntosBase = totalPreguntas * 10;
+  
   if (puntos >= (puntosBase / 2)) {
     localStorage.setItem(`dificultad_${categoria}`, 'dificil');
 
     const modal = document.getElementById('modalDesbloqueo');
     const usuarioSpan = document.getElementById('usuarioDesbloqueo');
     if (modal && usuarioSpan) {
+      reproducirSonido('racha'); // Usamos el sonido racha para la celebración
       usuarioSpan.textContent = getUsuario();
       modal.classList.remove('hidden');
       crearConfeti(modal);
@@ -470,11 +464,12 @@ function crearConfeti(container) {
   }
 }
 
-// Listener para cerrar modal de desbloqueo
+// Listener para cerrar modal de desbloqueo (Necesario para el sonido de click)
 document.addEventListener('DOMContentLoaded', () => {
   const btnCerrarDesbloqueo = document.getElementById('btnCerrarDesbloqueo');
   if (btnCerrarDesbloqueo) {
     btnCerrarDesbloqueo.addEventListener('click', () => {
+      reproducirClick(); // 🔥 SONIDO
       const modal = document.getElementById('modalDesbloqueo');
       if (modal) modal.classList.add('hidden');
       mostrarPantalla('pantallaMenu');

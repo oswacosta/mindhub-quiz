@@ -10,6 +10,67 @@ import { getFirestore, collection, addDoc } from "https://www.gstatic.com/fireba
 const db = getFirestore();
 
 // =====================================================
+// 👤 SISTEMA DE PERFIL Y NIVELES (Movido desde main.js)
+// =====================================================
+function calcularNivel(puntosTotales) {
+  const niveles = [
+    { nombre: "Novato", puntosRequeridos: 0, color: "#6B7280" },
+    { nombre: "Aprendiz", puntosRequeridos: 100, color: "#10B981" },
+    { nombre: "Experto", puntosRequeridos: 500, color: "#3B82F6" },
+    { nombre: "Maestro", puntosRequeridos: 1000, color: "#8B5CF6" },
+    { nombre: "Leyenda", puntosRequeridos: 2500, color: "#F59E0B" }
+  ];
+  
+  for (let i = niveles.length - 1; i >= 0; i--) {
+    if (puntosTotales >= niveles[i].puntosRequeridos) {
+      return niveles[i];
+    }
+  }
+  return niveles[0];
+}
+
+function obtenerProgresoNivel(puntosTotales) {
+  const nivelActual = calcularNivel(puntosTotales);
+  const niveles = [
+    { nombre: "Novato", puntosRequeridos: 0, color: "#6B7280" },
+    { nombre: "Aprendiz", puntosRequeridos: 100, color: "#10B981" },
+    { nombre: "Experto", puntosRequeridos: 500, color: "#3B82F6" },
+    { nombre: "Maestro", puntosRequeridos: 1000, color: "#8B5CF6" },
+    { nombre: "Leyenda", puntosRequeridos: 2500, color: "#F59E0B" }
+  ];
+  
+  const nivelIndex = niveles.findIndex(n => n.nombre === nivelActual.nombre);
+  const siguienteNivel = niveles[nivelIndex + 1];
+  
+  if (!siguienteNivel) {
+    return { progreso: 100, restante: 0, nivelSiguiente: 'Máximo' };
+  }
+  
+  const rango = siguienteNivel.puntosRequeridos - nivelActual.puntosRequeridos;
+  const progreso = ((puntosTotales - nivelActual.puntosRequeridos) / rango) * 100;
+  const restante = siguienteNivel.puntosRequeridos - puntosTotales;
+  
+  return { progreso: Math.min(100, Math.max(0, progreso)), restante, nivelSiguiente: siguienteNivel.nombre };
+}
+
+// Helper para obtener estadísticas de localStorage
+function obtenerEstadisticasUsuario() {
+  const usuario = localStorage.getItem('usuarioQuiz') || 'Invitado';
+  const stats = JSON.parse(localStorage.getItem(`stats_${usuario}`) || '{}');
+  
+  // Asegurar que existan los campos mínimos (necesarios para que no falle el modal)
+  return {
+    puntosTotales: stats.puntosTotales || 0,
+    partidasCompletadas: stats.partidasCompletadas || 0,
+    partidasPerfectas: stats.partidasPerfectas || 0,
+    rachaMaxima: stats.rachaMaxima || 0,
+    categoriasCompletadas: stats.categoriasCompletadas ? Object.keys(stats.categoriasCompletadas).length : 0,
+    ...stats
+  };
+}
+
+
+// =====================================================
 // 🧍 INICIALIZAR USUARIO
 // =====================================================
 export function initUsuario() {
@@ -75,7 +136,7 @@ export function seleccionarDificultad(nivel) {
 export async function guardarPuntuacionFirebase(categoria, puntos) {
   try {
     const usuario = localStorage.getItem('usuarioQuiz') || "Invitado";
-     const dificultad = localStorage.getItem('dificultadQuiz') || 'facil';
+    const dificultad = localStorage.getItem('dificultadQuiz') || 'facil';
     await addDoc(collection(db, "puntuaciones"), {
       usuario,
       categoria,
@@ -90,7 +151,9 @@ export async function guardarPuntuacionFirebase(categoria, puntos) {
   }
 }
 
-// Avatar
+// =====================================================
+// 🖼️ GESTIÓN DE AVATAR
+// =====================================================
 const avatares = [
   'avatars/avatar1.png',
   'avatars/avatar2.png',
@@ -148,3 +211,56 @@ export function cerrarAvatarModal() {
   document.getElementById('avatarModal').classList.add('oculto');
 }
 
+// =====================================================
+// 👤 GESTIÓN DE MODAL DE PERFIL (SOLUCIÓN AL PROBLEMA)
+// =====================================================
+
+export function abrirPerfilModal() {
+    const modal = document.getElementById('perfilModal');
+    if (!modal) return;
+
+    const usuario = localStorage.getItem('usuarioQuiz') || 'Invitado';
+    const stats = obtenerEstadisticasUsuario(); // Usamos el helper local
+
+    // --- CÁLCULOS DE NIVEL ---
+    const nivelActual = calcularNivel(stats.puntosTotales);
+    const progreso = obtenerProgresoNivel(stats.puntosTotales);
+    
+    // --- ACTUALIZACIÓN DE DATOS DEL MODAL ---
+    
+    // Header
+    document.getElementById('nombrePerfil').textContent = usuario;
+    document.getElementById('avatarPerfil').src = localStorage.getItem('avatarUsuario') || 'avatars/avatar0.png';
+
+    // Nivel
+    const nivelBadge = document.getElementById('nivelActual');
+    nivelBadge.textContent = nivelActual.nombre;
+    nivelBadge.style.backgroundColor = nivelActual.color; // Opcional: aplicar el color
+    
+    document.getElementById('puntosTotales').textContent = `${stats.puntosTotales} puntos totales`;
+
+    // Stats Grid
+    document.getElementById('statPartidas').textContent = stats.partidasCompletadas;
+    document.getElementById('statPerfectas').textContent = stats.partidasPerfectas;
+    document.getElementById('statRacha').textContent = stats.rachaMaxima;
+    document.getElementById('statCategorias').textContent = stats.categoriasCompletadas;
+    
+    // Progreso
+    document.getElementById('infoNivel').textContent = `Nivel: ${nivelActual.nombre}`;
+    document.getElementById('barraProgreso').style.width = `${progreso.progreso}%`;
+
+    const infoProximoNivel = document.getElementById('infoProximoNivel');
+    if (progreso.nivelSiguiente === 'Máximo') {
+        infoProximoNivel.textContent = '¡Nivel máximo alcanzado! 🏆';
+    } else {
+        infoProximoNivel.textContent = `${progreso.restante} puntos para el siguiente nivel (${progreso.nivelSiguiente})`;
+    }
+
+    // Mostrar el modal
+    modal.classList.remove('hidden');
+}
+
+export function cerrarPerfilModal() {
+    const modal = document.getElementById('perfilModal');
+    if(modal) modal.classList.add('hidden');
+}
