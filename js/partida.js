@@ -1,8 +1,12 @@
 // partida.js
 import { CONFIG } from './config.js';
-import { bancoPreguntas } from './bancoPreguntas.js';
 import { mostrarPantalla, shuffle, guardarLogro } from './utils.js';
 import { guardarPuntuacionFirebase } from './usuario.js';
+// IMPORTANTE: Usamos la misma URL que en index.html para evitar conflictos
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+// Enganchamos con la base de datos que ya inició el index.html
+const db = getFirestore();
 
 // =====================================================
 // ⚙️ ESTADO DE PARTIDA
@@ -16,6 +20,9 @@ let temporizadorId = null;
 let tiempoRestante = 0;
 let rachaMaxima = 0;
 
+// 📦 CACHÉ: Para no descargar las mismas preguntas dos veces en la misma sesión
+let cachePreguntas = {};
+
 // =====================================================
 // 🔍 HELPERS
 // =====================================================
@@ -28,7 +35,7 @@ function getDificultad() {
 }
 
 // =====================================================
-// 🎯 SISTEMA DE ESTADÍSTICAS Y NIVELES
+// 📊 ESTADÍSTICAS Y NIVELES (Lógica interna)
 // =====================================================
 function actualizarEstadisticasUsuario(resultadoPartida) {
   const usuario = getUsuario();
@@ -62,11 +69,49 @@ function actualizarEstadisticasUsuario(resultadoPartida) {
   return stats;
 }
 
-// En main.js y partida.js
-import { calcularNivel, obtenerProgresoNivel } from './niveles.js';
+function calcularNivel(puntosTotales) {
+  const niveles = [
+    { nombre: "Novato", puntosRequeridos: 0, color: "#6B7280" },
+    { nombre: "Aprendiz", puntosRequeridos: 100, color: "#10B981" },
+    { nombre: "Experto", puntosRequeridos: 500, color: "#3B82F6" },
+    { nombre: "Maestro", puntosRequeridos: 1000, color: "#8B5CF6" },
+    { nombre: "Leyenda", puntosRequeridos: 2500, color: "#F59E0B" }
+  ];
+  
+  for (let i = niveles.length - 1; i >= 0; i--) {
+    if (puntosTotales >= niveles[i].puntosRequeridos) {
+      return niveles[i];
+    }
+  }
+  return niveles[0];
+}
+
+function obtenerProgresoNivel(puntosTotales) {
+  const nivelActual = calcularNivel(puntosTotales);
+  const niveles = [
+    { nombre: "Novato", puntosRequeridos: 0, color: "#6B7280" },
+    { nombre: "Aprendiz", puntosRequeridos: 100, color: "#10B981" },
+    { nombre: "Experto", puntosRequeridos: 500, color: "#3B82F6" },
+    { nombre: "Maestro", puntosRequeridos: 1000, color: "#8B5CF6" },
+    { nombre: "Leyenda", puntosRequeridos: 2500, color: "#F59E0B" }
+  ];
+  
+  const nivelIndex = niveles.findIndex(n => n.nombre === nivelActual.nombre);
+  const siguienteNivel = niveles[nivelIndex + 1];
+  
+  if (!siguienteNivel) {
+    return { progreso: 100, restante: 0 };
+  }
+  
+  const rango = siguienteNivel.puntosRequeridos - nivelActual.puntosRequeridos;
+  const progreso = ((puntosTotales - nivelActual.puntosRequeridos) / rango) * 100;
+  const restante = siguienteNivel.puntosRequeridos - puntosTotales;
+  
+  return { progreso: Math.min(100, Math.max(0, progreso)), restante };
+}
 
 /* =====================================================
-🎯 SELECCIONAR CATEGORÍA E INICIAR PARTIDA
+🎯 SELECCIONAR CATEGORÍA
 ===================================================== */
 export function seleccionarCategoria(cat) {
   categoria = cat;
@@ -78,21 +123,18 @@ export function seleccionarCategoria(cat) {
   const cerrarModal = document.getElementById('cerrarModal');
 
   if (!modal || !titulo || !btnFacil || !btnDificil || !cerrarModal) {
-    console.warn("Modal de dificultad no encontrado. Se inicia partida directa.");
+    console.warn("Modal no encontrado, iniciando directo.");
     iniciarPartida();
     return;
   }
 
-  // Actualizar título
   titulo.textContent = `Categoría: ${cat}`;
   modal.classList.remove('oculto');
 
-  // Verificar si la dificultad difícil está desbloqueada
   const desbloqueado = localStorage.getItem(`dificultad_${cat}`) === 'dificil';
   btnDificil.disabled = !desbloqueado;
   btnDificil.innerHTML = desbloqueado ? 'Difícil' : 'Difícil 🔒';
 
-  // Listeners de selección
   btnFacil.onclick = () => {
     localStorage.setItem('dificultadQuiz', 'facil');
     modal.classList.add('oculto');
@@ -111,20 +153,75 @@ export function seleccionarCategoria(cat) {
 }
 
 /* =====================================================
-🎮 INICIAR PARTIDA
+☁️ DESCARGAR PREGUNTAS
 ===================================================== */
-export function iniciarPartida() {
-  const dificultad = getDificultad();
-  const todas = (bancoPreguntas[dificultad] && bancoPreguntas[dificultad][categoria])
-    ? bancoPreguntas[dificultad][categoria]
-    : [];
+async function cargarPreguntas(categoria, dificultad) {
+  const clave = `${dificultad}_${categoria}`;
+  
+  // 1. Mirar en caché primero
+  if (cachePreguntas[clave]) {
+    console.log("📦 Usando caché local para", clave);
+    return cachePreguntas[clave];
+  }
 
-  if (!Array.isArray(todas) || todas.length === 0) {
-    alert("No hay preguntas disponibles para esta categoría/dificultad. Añade preguntas al banco.");
+  // 2. Descargar de Firebase
+  console.log(`☁️ Descargando preguntas de ${categoria} (${dificultad})...`);
+  
+  try {
+    const q = query(
+      collection(db, "preguntas"),
+      where("categoria", "==", categoria),
+      where("dificultad", "==", dificultad)
+    );
+
+    const snapshot = await getDocs(q);
+    const lista = [];
+    
+    snapshot.forEach(doc => {
+      lista.push(doc.data());
+    });
+
+    // 3. Guardar en caché si encontramos algo
+    if (lista.length > 0) {
+      cachePreguntas[clave] = lista;
+      return lista;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Error descargando preguntas:", error);
+    return null; // Retornamos null para indicar error de conexión
+  }
+}
+
+/* =====================================================
+🎮 INICIAR PARTIDA 
+===================================================== */
+export async function iniciarPartida() {
+  const dificultad = getDificultad();
+  
+  // 1. Mostrar pantalla de carga
+  mostrarPantalla('pantallaCarga'); 
+
+  // 2. Esperar descarga de preguntas
+  const todas = await cargarPreguntas(categoria, dificultad);
+
+  // 3. Validaciones
+  if (todas === null) {
+    alert("Error de conexión. Revisa tu internet.");
+    mostrarPantalla('pantallaMenu');
     return;
   }
 
+  if (todas.length === 0) {
+    alert(`No hay preguntas disponibles en la nube para ${categoria}.`);
+    mostrarPantalla('pantallaMenu');
+    return;
+  }
+
+  // 4. Configuración del juego (igual que antes)
   const cfg = CONFIG[dificultad] || CONFIG.facil;
+  
   preguntasPartida = shuffle(todas).slice(0, cfg.perGame).map(q => ({
     ...q,
     opciones: shuffle(Array.isArray(q.opciones) ? q.opciones.slice() : [])
@@ -163,10 +260,7 @@ function mostrarPregunta() {
     texto.textContent = `Pregunta ${preguntaIndex + 1} / ${preguntasPartida.length}: ${q.pregunta}`;
 
   const opcionesDiv = document.getElementById('opciones');
-  if (!opcionesDiv) {
-    console.error("mostrarPregunta: no existe #opciones en el DOM");
-    return;
-  }
+  if (!opcionesDiv) return;
 
   opcionesDiv.innerHTML = '';
   (q.opciones || []).forEach(op => {
@@ -204,10 +298,12 @@ function manejarTiempoAgotado() {
   document.querySelectorAll('.opcion').forEach(b => b.disabled = true);
   const msg = document.getElementById('mensaje');
   if (msg) msg.textContent = "¡Tiempo agotado!";
+  
   const correcta = preguntasPartida[preguntaIndex]?.correcta;
   document.querySelectorAll('.opcion').forEach(b => {
     if (b.textContent === correcta) b.classList.add('correcta');
   });
+  
   racha = 0;
   setTimeout(() => {
     preguntaIndex++;
@@ -221,7 +317,7 @@ function manejarTiempoAgotado() {
 function seleccionarRespuesta(opcion, boton) {
   clearInterval(temporizadorId);
   const q = preguntasPartida[preguntaIndex];
-  if (!q) return console.warn("seleccionarRespuesta: pregunta no encontrada", preguntaIndex);
+  if (!q) return;
 
   document.querySelectorAll('.opcion').forEach(b => b.disabled = true);
 
@@ -232,6 +328,7 @@ function seleccionarRespuesta(opcion, boton) {
     puntos += (dificultad === 'facil') ? 10 : 30;
     racha++;
     rachaMaxima = Math.max(rachaMaxima, racha);
+    
     if (racha === 2) puntos += 5;
     else if (racha === 3) puntos += 10;
     else if (racha >= 4) puntos += 15;
@@ -251,7 +348,7 @@ function seleccionarRespuesta(opcion, boton) {
 }
 
 /* =====================================================
-🏁 FINALIZAR PARTIDA (CORREGIDA)
+🏁 FINALIZAR PARTIDA
 ===================================================== */
 function finalizarPartida() {
   console.log("Finalizando partida...");
@@ -260,7 +357,7 @@ function finalizarPartida() {
   const usuario = getUsuario();
   const dificultad = getDificultad();
   
-  // Guardar logro
+  // Guardar logro local
   guardarLogro(usuario, categoria, dificultad, puntos);
 
   // Actualizar estadísticas
@@ -299,13 +396,11 @@ function finalizarPartida() {
   // Guardar puntuación en Firebase
   guardarPuntuacionFirebase(categoria, puntos);
 
-  // Verificar y desbloquear dificultad difícil
+  // Verificar desbloqueo de dificultad difícil
   verificarDesbloqueo();
 
-  // Mostrar pantalla final
   setTimeout(() => {
     mostrarPantalla('pantallaFinal');
-    console.log("Pantalla final mostrada");
   }, 500);
 }
 
@@ -317,10 +412,14 @@ function verificarDesbloqueo() {
   if (dificultad !== 'facil') return;
 
   const totalPreguntas = preguntasPartida.length;
-  const aciertos = Math.round(puntos / 10);
-  const porcentaje = (aciertos / totalPreguntas) * 100;
-
-  if (porcentaje >= 50) {
+  const aciertos = Math.round(puntos / 10); // Aprox, asumiendo sin bonos de racha para simplificar
+  
+  // Si queremos ser más precisos con los aciertos, podríamos contarlos en seleccionarRespuesta
+  // Pero para desbloquear, >50% de los puntos máximos posibles suele valer.
+  // Usemos un cálculo simple: si tienes más de la mitad de puntos base (10 * preguntas / 2)
+  
+  const puntosBase = totalPreguntas * 10;
+  if (puntos >= (puntosBase / 2)) {
     localStorage.setItem(`dificultad_${categoria}`, 'dificil');
 
     const modal = document.getElementById('modalDesbloqueo');
@@ -338,7 +437,6 @@ function verificarDesbloqueo() {
 ===================================================== */
 export function repetirPartida() {
   if (!categoria) {
-    console.warn("No hay categoría seleccionada. Volviendo al menú principal.");
     mostrarPantalla('pantallaMenu');
     return;
   }
@@ -372,9 +470,7 @@ function crearConfeti(container) {
   }
 }
 
-/* =====================================================
-🎯 CERRAR MODAL DE DESBLOQUEO
-===================================================== */
+// Listener para cerrar modal de desbloqueo
 document.addEventListener('DOMContentLoaded', () => {
   const btnCerrarDesbloqueo = document.getElementById('btnCerrarDesbloqueo');
   if (btnCerrarDesbloqueo) {
