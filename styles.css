@@ -661,19 +661,12 @@ html, body {
 }
 
 /* =====================================================
-🔘 BOTONES FLOTANTES DENTRO DEL MENÚ (CORREGIDO)
+🏆 BOTÓN DE LOGROS (VERSIÓN MEJORADA)
 ===================================================== */
-.floating-buttons {
-  position: absolute;
-  top: 20px;
+.btn-logros {
+  position: fixed;
+  top: max(20px, env(safe-area-inset-top));
   right: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 200;
-}
-
-.btn-logros, .btn-puntos {
   background: var(--accent);
   color: white;
   border: none;
@@ -682,142 +675,46 @@ html, body {
   font-weight: 600;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.3s, transform 0.2s;
-  font-size: 0.9rem;
-}
-
-.btn-logros:hover, .btn-puntos:hover {
-  background: #222;
-  transform: scale(1.05);
-}
-
-.btn-logros:active, .btn-puntos:active {
-  transform: scale(0.98);
+  z-index: 200;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
 /* =====================================================
-📝 EXPLICACIÓN DE PUNTOS (COMPACTA)
+💡 BOTÓN DE PUNTOS (VERSIÓN MEJORADA)
+===================================================== */
+.btn-puntos {
+  position: fixed;
+  top: max(70px, calc(env(safe-area-inset-top) + 50px));
+  right: 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  z-index: 200;
+  white-space: nowrap;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+/* =====================================================
+📝 EXPLICACIÓN DE PUNTOS (VERSIÓN MEJORADA)
 ===================================================== */
 .explicacion-puntos {
-  position: absolute;
-  top: 120px;
-  right: 0;
+  position: fixed;
+  top: max(100px, calc(env(safe-area-inset-top) + 80px));
+  right: 20px;
   background: var(--accent);
   color: white;
   border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 0.8rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   max-width: 220px;
   line-height: 1.3;
   z-index: 190;
-}
-
-.explicacion-puntos ul {
-  margin: 5px 0 0 12px;
-  padding: 0;
-  list-style-type: disc;
-}
-
-.explicacion-puntos ul ul {
-  list-style-type: circle;
-  margin-left: 12px;
-  margin-top: 3px;
-}
-
-.explicacion-puntos li {
-  margin-bottom: 3px;
-  font-size: 0.75rem;
-}
-
-/* Hacer las listas más compactas */
-.explicacion-puntos ul, 
-.explicacion-puntos ul ul {
-  line-height: 1.2;
-}
-
-/* Para móviles - aún más compacto */
-@media (max-width: 768px) {
-  .explicacion-puntos {
-    top: 110px;
-    max-width: 200px;
-    padding: 8px 10px;
-    font-size: 0.75rem;
-  }
-  
-  .explicacion-puntos li {
-    font-size: 0.7rem;
-    margin-bottom: 2px;
-  }
-}
-
-@media (max-width: 480px) {
-  .explicacion-puntos {
-    top: 100px;
-    max-width: 180px;
-    padding: 6px 8px;
-  }
-  
-  .explicacion-puntos ul {
-    margin-left: 10px;
-  }
-}
-
-/* Asegurar que el menú tenga posición relativa para los botones absolutos */
-#pantallaMenu {
-  position: relative;
-  
-}
-
-/* Ajustar el grid de categorías para no superponerse */
-#pantallaMenu .grid-cat {
-  margin-top: 20px;
-  position: relative;
-  z-index: 100;
-}
-
-/* Para móviles */
-@media (max-width: 768px) {
-  .floating-buttons {
-    top: 15px;
-    right: 15px;
-  }
-  
-  .btn-logros, .btn-puntos {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-  
-  .explicacion-puntos {
-    top: 110px;
-    max-width: 200px;
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .floating-buttons {
-    top: 10px;
-    right: 10px;
-    gap: 8px;
-  }
-  
-  .btn-logros, .btn-puntos {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-  }
-  
-  .explicacion-puntos {
-    top: 100px;
-    max-width: 180px;
-    padding: 10px 12px;
-  }
-  
-  /* Asegurar que en móviles el menú no sea demasiado alto */
-  #pantallaMenu {
-    padding: 20px 15px;
-  }
 }
 
 /* =====================================================

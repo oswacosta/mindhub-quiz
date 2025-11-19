@@ -85,20 +85,21 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-   <!-- Menú principal -->
-<div id="pantallaMenu" class="pantalla">
-  <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom: 20px;">
-    <div>
-      <h2>Selecciona una categoría</h2>
-      <p class="muted">Usuario: <span id="labelUsuario">Invitado</span></p>
-    </div>
-    
-    <div style="display:flex; align-items:center; gap:8px;">
-      <img id="imgPerfil" src="avatars/avatar0.png" class="avatar-peq">
-      <button onclick="abrirAvatarModal()" class="btn-avatar">Avatar</button>
-      <button id="btnPerfil" class="btn-avatar">👤 Perfil</button>
-    </div>
-  </div>
+    <!-- Menú principal -->
+    <div id="pantallaMenu" class="pantalla">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2>Selecciona una categoría</h2>
+          <p class="muted">Usuario: <span id="labelUsuario">Invitado</span></p>
+        </div>
+        
+        <!-- En el menú principal, cambia el botón -->
+        <div style="display:flex; align-items:center; gap:8px;">
+          <img id="imgPerfil" src="avatars/avatar0.png" class="avatar-peq">
+          <button onclick="abrirAvatarModal()" class="btn-avatar">Avatar</button>
+          <button id="btnPerfil" class="btn-avatar">👤 Perfil</button>
+        </div>
+      </div>
 
       <div class="grid-cat" style="margin-top:12px">
         <button class="categoria-btn" onclick="seleccionarCategoria('Historia')">Historia</button>
@@ -110,11 +111,13 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
 
-      <!-- Botones flotantes DENTRO del menú -->
-  <div class="floating-buttons">
+    <!-- Botón de logros (fixed) -->
     <button id="btnLogros" class="btn-logros">🏆 Logros</button>
+
+    <!-- Botón de Puntos -->
     <button id="btnPuntos" class="btn-puntos">💡 Puntos</button>
-    
+
+    <!-- Explicación de Puntos -->
     <div id="explicacionPuntos" class="explicacion-puntos oculto">
       <ul>
         <li>Cada respuesta correcta: 10 pts (fácil) / 30 pts (difícil)</li>
@@ -127,7 +130,6 @@ window.addEventListener('DOMContentLoaded', () => {
         </li>
       </ul>
     </div>
-  </div>
 
     <div id="listaPuntuaciones"></div>
 
