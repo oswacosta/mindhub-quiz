@@ -1300,51 +1300,42 @@ body.pwa-mode::before {
 }
 
 /* =====================================================
-📱 CORRECCIÓN ESPECÍFICA PARA MODO PWA PANTALLA COMPLETA
+📱 CORRECCIÓN ESPECÍFICA PARA MODO PWA
 ===================================================== */
 
-/* Reset para body en modo PWA */
+/* Ajustes suaves para PWA sin romper el fondo */
 body.pwa-mode {
-  position: relative;
-  overflow: auto !important;
-  height: auto !important;
-  width: 100% !important;
-  background: transparent !important;
+  /* Mantener el tamaño completo para que se vea el fondo */
+  min-height: 100vh;
+  /* Asegurar que el contenido respete el 'notch' o área segura del móvil */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
-/* Asegurar que el contenedor principal sea visible */
-body.pwa-mode .container {
-  position: relative;
-  z-index: 1000;
-  background: transparent;
+/* Asegurar que los botones flotantes estén siempre por encima y respeten el área segura */
+@media (display-mode: standalone) {
+  .btn-logros {
+    top: max(20px, env(safe-area-inset-top) + 10px) !important;
+    z-index: 2000 !important; /* Z-index muy alto para asegurar visibilidad */
+  }
+  
+  .btn-puntos {
+    top: max(70px, env(safe-area-inset-top) + 60px) !important;
+    z-index: 2000 !important;
+  }
+
+  .explicacion-puntos {
+    top: max(100px, env(safe-area-inset-top) + 90px) !important;
+    z-index: 1999 !important;
+  }
 }
 
-/* Asegurar que las pantallas sean visibles */
-body.pwa-mode .pantalla {
-  position: relative;
-  z-index: 1001;
-  background: white;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* Corregir la superposición verde/modal */
-body.pwa-mode::before {
-  display: none !important;
-}
-
+/* Corrección para asegurar que el fondo de partículas se vea en PWA */
+body.pwa-mode::before,
 body.pwa-mode::after {
-  display: none !important;
-}
-
-/* Forzar que todos los elementos modales estén correctamente posicionados */
-body.pwa-mode .modal {
-  position: fixed !important;
-  z-index: 10000 !important;
-  background: rgba(0, 0, 0, 0.8) !important;
-}
-
-/* Asegurar que los botones sean clickeables */
-body.pwa-mode button {
-  z-index: 1002;
-  position: relative;
+  display: block !important; /* Forzamos que se muestren */
+  position: fixed; /* Aseguramos que se queden fijos al fondo */
+  z-index: -1;
 }
