@@ -1227,3 +1227,53 @@ body.pwa-mode::before {
     max-height: 300px;
   }
 }
+
+/* =====================================================
+📱 CORRECCIÓN ESPECÍFICA PARA MODO PWA PANTALLA COMPLETA
+===================================================== */
+
+/* Reset para body en modo PWA */
+body.pwa-mode {
+  position: relative;
+  overflow: auto !important;
+  height: auto !important;
+  width: 100% !important;
+  background: transparent !important;
+}
+
+/* Asegurar que el contenedor principal sea visible */
+body.pwa-mode .container {
+  position: relative;
+  z-index: 1000;
+  background: transparent;
+}
+
+/* Asegurar que las pantallas sean visibles */
+body.pwa-mode .pantalla {
+  position: relative;
+  z-index: 1001;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Corregir la superposición verde/modal */
+body.pwa-mode::before {
+  display: none !important;
+}
+
+body.pwa-mode::after {
+  display: none !important;
+}
+
+/* Forzar que todos los elementos modales estén correctamente posicionados */
+body.pwa-mode .modal {
+  position: fixed !important;
+  z-index: 10000 !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Asegurar que los botones sean clickeables */
+body.pwa-mode button {
+  z-index: 1002;
+  position: relative;
+}
