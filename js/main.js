@@ -6,46 +6,8 @@ import { mostrarLogros, cerrarLogros, cargarPuntuaciones } from './logros.js';
 // =====================================================
 // 👤 SISTEMA DE PERFIL
 // =====================================================
-function calcularNivel(puntosTotales) {
-  const niveles = [
-    { nombre: "Novato", puntosRequeridos: 0, color: "#6B7280" },
-    { nombre: "Aprendiz", puntosRequeridos: 100, color: "#10B981" },
-    { nombre: "Experto", puntosRequeridos: 500, color: "#3B82F6" },
-    { nombre: "Maestro", puntosRequeridos: 1000, color: "#8B5CF6" },
-    { nombre: "Leyenda", puntosRequeridos: 2500, color: "#F59E0B" }
-  ];
-  
-  for (let i = niveles.length - 1; i >= 0; i--) {
-    if (puntosTotales >= niveles[i].puntosRequeridos) {
-      return niveles[i];
-    }
-  }
-  return niveles[0];
-}
 
-function obtenerProgresoNivel(puntosTotales) {
-  const nivelActual = calcularNivel(puntosTotales);
-  const niveles = [
-    { nombre: "Novato", puntosRequeridos: 0, color: "#6B7280" },
-    { nombre: "Aprendiz", puntosRequeridos: 100, color: "#10B981" },
-    { nombre: "Experto", puntosRequeridos: 500, color: "#3B82F6" },
-    { nombre: "Maestro", puntosRequeridos: 1000, color: "#8B5CF6" },
-    { nombre: "Leyenda", puntosRequeridos: 2500, color: "#F59E0B" }
-  ];
-  
-  const nivelIndex = niveles.findIndex(n => n.nombre === nivelActual.nombre);
-  const siguienteNivel = niveles[nivelIndex + 1];
-  
-  if (!siguienteNivel) {
-    return { progreso: 100, restante: 0 };
-  }
-  
-  const rango = siguienteNivel.puntosRequeridos - nivelActual.puntosRequeridos;
-  const progreso = ((puntosTotales - nivelActual.puntosRequeridos) / rango) * 100;
-  const restante = siguienteNivel.puntosRequeridos - puntosTotales;
-  
-  return { progreso: Math.min(100, Math.max(0, progreso)), restante };
-}
+import { calcularNivel, obtenerProgresoNivel } from './niveles.js';
 
 function obtenerEstadisticasUsuario() {
   const usuario = localStorage.getItem('usuarioQuiz') || 'Invitado';
