@@ -1321,7 +1321,7 @@ body.pwa-mode {
       radial-gradient(ellipse at 60% 60%, rgba(249, 115, 22, 0.3) 0%, transparent 50%),
       linear-gradient(135deg, #0c0a1d 0%, #1e1b4b 100%) !important;
     
-   /* Asegurar que el contenido no se meta debajo del 'notch' (cámara frontal) */
+    /* Asegurar que el contenido no se meta debajo del 'notch' (cámara frontal) */
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);
@@ -1345,20 +1345,12 @@ body.pwa-mode::before {
 
 /* 3. Posicionamiento de Botones (Más abajo y a la izquierda) */
 @media (display-mode: standalone) {
-    :root {
-        --pwa-fab-top: clamp(120px, 18vh, 200px);
-        --pwa-fab-gap: 58px;
-        --pwa-fab-right: max(12px, env(safe-area-inset-right));
-    }
-
     /* Botón de LOGROS */
     .btn-logros {
         position: fixed !important;
         /* Bajamos 20px extra + el espacio de la barra de estado */
         top: calc(env(safe-area-inset-top) + 20px) !important; 
         right: 20px !important;
-        top: calc(env(safe-area-inset-top) + var(--pwa-fab-top)) !important; 
-        right: var(--pwa-fab-right) !important;
         z-index: 9999 !important; /* Siempre encima */
     }
   
@@ -1368,8 +1360,6 @@ body.pwa-mode::before {
         /* Calculamos la posición relativa al botón de arriba */
         top: calc(env(safe-area-inset-top) + 75px) !important;
         right: 20px !important;
-        top: calc(env(safe-area-inset-top) + var(--pwa-fab-top) + var(--pwa-fab-gap)) !important;
-        right: var(--pwa-fab-right) !important;
         z-index: 9999 !important;
     }
 
@@ -1378,8 +1368,6 @@ body.pwa-mode::before {
         position: fixed !important;
         top: calc(env(safe-area-inset-top) + 120px) !important;
         right: 20px !important;
-        top: calc(env(safe-area-inset-top) + var(--pwa-fab-top) + (var(--pwa-fab-gap) * 2)) !important;
-        right: var(--pwa-fab-right) !important;
         z-index: 9998 !important;
     }
 }
