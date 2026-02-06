@@ -636,7 +636,7 @@ html, body {
 }
 
 /* =====================================================
-🏆 BOTONES FLOTANTES - POSICIONAMIENTO CORREGIDO
+🏆 BOTONES FLOTANTES - SIEMPRE ARRIBA A LA DERECHA
 ===================================================== */
 
 .btn-logros, .btn-puntos {
@@ -655,14 +655,14 @@ html, body {
   display: none; /* Ocultos por defecto */
 }
 
-/* POSICIÓN BASE - ESCRITORIO */
+/* POSICIÓN PARA TODOS LOS DISPOSITIVOS */
 .btn-logros {
   top: 20px;
   right: 20px;
 }
 
 .btn-puntos {
-  top: 75px; /* Más espacio respecto al botón de logros */
+  top: 70px;
   right: 20px;
 }
 
@@ -672,17 +672,10 @@ html, body {
   display: block;
 }
 
-/* Hover effects */
-.btn-logros:hover,
-.btn-puntos:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-}
-
-/* Explicación de puntos */
+/* Explicación de puntos - ESTILOS CORREGIDOS */
 .explicacion-puntos {
   position: fixed;
-  top: 130px; /* Más abajo para no tapar otros botones */
+  top: 100px;
   right: 20px;
   background: var(--accent);
   color: white;
@@ -693,6 +686,9 @@ html, body {
   max-width: 250px;
   line-height: 1.4;
   z-index: 190;
+  
+  /* IMPORTANTE: Quitar display:none por defecto */
+  /* display: none; */ /* ← ESTA LÍNEA DEBE ELIMINARSE */
 }
 
 /* Clase para ocultar la explicación */
@@ -706,10 +702,9 @@ html, body {
 }
 
 /* =====================================================
-📱 AJUSTES PARA MÓVIL - CORREGIDOS
+📱 AJUSTES PARA MÓVIL
 ===================================================== */
 @media (max-width: 768px) {
-  /* Espaciado entre botones aumentado */
   .btn-logros {
     top: 15px;
     right: 15px;
@@ -718,14 +713,14 @@ html, body {
   }
   
   .btn-puntos {
-    top: 70px; /* Más separación */
+    top: 60px;
     right: 15px;
     padding: 8px 12px;
     font-size: 0.9rem;
   }
   
   .explicacion-puntos {
-    top: 125px; /* Más separación */
+    top: 95px;
     right: 15px;
     max-width: 220px;
     font-size: 0.8rem;
@@ -734,7 +729,7 @@ html, body {
   
   /* Asegurar que el contenido no quede detrás de los botones */
   .container {
-    padding-top: 140px; /* Más espacio arriba */
+    padding-top: 100px;
     padding-bottom: 20px;
   }
   
@@ -747,70 +742,49 @@ html, body {
 /* Para pantallas muy pequeñas */
 @media (max-width: 480px) {
   .btn-logros {
-    top: 12px;
-    right: 12px;
-    padding: 7px 11px;
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
     font-size: 0.85rem;
   }
   
   .btn-puntos {
-    top: 65px; /* Separación aumentada */
-    right: 12px;
-    padding: 7px 11px;
+    top: 50px;
+    right: 10px;
+    padding: 6px 10px;
     font-size: 0.85rem;
   }
   
   .explicacion-puntos {
-    top: 118px; /* Más separación */
-    right: 12px;
+    top: 85px;
+    right: 10px;
     max-width: 200px;
     padding: 8px 10px;
     font-size: 0.75rem;
   }
   
   .container {
-    padding-top: 130px;
+    padding-top: 90px;
   }
 }
 
 /* =====================================================
-🎯 BOTONES EN MODO PWA - SOLUCIÓN DEFINITIVA
+🎯 BOTONES EN MODO PWA
 ===================================================== */
 @media (display-mode: standalone) {
-  /* Botón Logros - Respeta área segura del dispositivo */
   .btn-logros {
-    top: max(15px, calc(env(safe-area-inset-top) + 10px)) !important;
-    right: 15px !important;
-    z-index: 9999 !important;
+    top: max(15px, env(safe-area-inset-top));
+    right: 15px;
   }
   
-  /* Botón Puntos - Separación aumentada */
   .btn-puntos {
-    top: max(70px, calc(env(safe-area-inset-top) + 65px)) !important;
-    right: 15px !important;
-    z-index: 9999 !important;
+    top: max(60px, calc(env(safe-area-inset-top) + 45px));
+    right: 15px;
   }
   
-  /* Explicación Puntos */
   .explicacion-puntos {
-    top: max(125px, calc(env(safe-area-inset-top) + 120px)) !important;
-    right: 15px !important;
-    z-index: 9998 !important;
-  }
-
-  /* Ajuste para pantallas pequeñas en PWA */
-  @media (max-width: 480px) {
-    .btn-logros {
-      top: max(12px, calc(env(safe-area-inset-top) + 8px)) !important;
-    }
-    
-    .btn-puntos {
-      top: max(65px, calc(env(safe-area-inset-top) + 60px)) !important;
-    }
-    
-    .explicacion-puntos {
-      top: max(118px, calc(env(safe-area-inset-top) + 113px)) !important;
-    }
+    top: max(95px, calc(env(safe-area-inset-top) + 80px));
+    right: 15px;
   }
 }
 
@@ -1367,4 +1341,33 @@ body.pwa-mode::before {
     width: 100%;
     height: 100%;
     z-index: -1;
+}
+
+/* 3. Posicionamiento de Botones (Más abajo y a la izquierda) */
+@media (display-mode: standalone) {
+    /* Botón de LOGROS */
+    .btn-logros {
+        position: fixed !important;
+        /* Bajamos 20px extra + el espacio de la barra de estado */
+        top: calc(env(safe-area-inset-top) + 20px) !important; 
+        right: 20px !important;
+        z-index: 9999 !important; /* Siempre encima */
+    }
+  
+    /* Botón de PUNTOS */
+    .btn-puntos {
+        position: fixed !important;
+        /* Calculamos la posición relativa al botón de arriba */
+        top: calc(env(safe-area-inset-top) + 75px) !important;
+        right: 20px !important;
+        z-index: 9999 !important;
+    }
+
+    /* Explicación flotante */
+    .explicacion-puntos {
+        position: fixed !important;
+        top: calc(env(safe-area-inset-top) + 120px) !important;
+        right: 20px !important;
+        z-index: 9998 !important;
+    }
 }
